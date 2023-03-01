@@ -44,15 +44,30 @@ Resources:
     Type: AWS::EC2::NatGateway
     Properties:
         AllocationId: !GetAtt NATGatewayEIP.AllocationId
-        SubnetId: !Ref PublicSubnet
+        SubnetId: !Ref PublicSubnet1
         Tags:
         - Key: stack
           Value: production
   NATGatewayEIP:
     Type: AWS::EC2::EIP
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
     Properties:
-        Domain: vpc
-  
+      VpcId: !Ref MainVPC
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MainVPC
+  AssociatePUBRT:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1
+  AssociatePRIRT:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet1
   RouteNATGateway:
     DependsOn: NATGateway
     Type: AWS::EC2::Route
